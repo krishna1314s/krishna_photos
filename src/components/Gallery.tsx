@@ -1,10 +1,14 @@
 import {useEffect, useRef, useState} from 'react';
 import {chapters, gallery, imgs} from '../content';
+import {useReducedMotion} from '../hooks/useReducedMotion';
 import {useReveals} from '../hooks/useReveals';
+import {useScrollPhotos} from '../hooks/useScrollPhotos';
 
 /** Chapter cards (each carries its size as orbit rings) filter the full gallery; every frame opens full screen. */
 export function Gallery() {
   const ref = useReveals<HTMLElement>();
+  const reduced = useReducedMotion();
+  useScrollPhotos(ref, reduced);
   const gridRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [tab, setTab] = useState<string>('all');
@@ -39,9 +43,9 @@ export function Gallery() {
   const fig = (id: string, i: number, feature: boolean) => {
     const m = imgs[id];
     return (
-      <figure key={id} data-reveal className={feature ? 'col-span-full' : 'mb-3 break-inside-avoid md:mb-4'}>
-        <button type="button" onClick={() => open(i)} aria-label={`Open photo: ${m.alt}`} className={`group relative block w-full cursor-zoom-in overflow-hidden rounded-[6px] bg-void-2 ${feature ? 'aspect-[2576/1142]' : ''}`} style={feature ? undefined : {aspectRatio: `${m.w}/${m.h}`}}>
-          <img src={m.src} width={m.w} height={m.h} alt={m.alt} loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]" />
+      <figure key={id} className={feature ? 'col-span-full' : 'mb-3 break-inside-avoid md:mb-4'}>
+        <button type="button" onClick={() => open(i)} aria-label={`Open photo: ${m.alt}`} data-photo data-side={i % 2 ? 'r' : 'l'} className={`group relative block w-full cursor-zoom-in overflow-hidden rounded-[6px] bg-void-2 will-change-transform ${feature ? 'aspect-[2576/1142]' : ''}`} style={feature ? undefined : {aspectRatio: `${m.w}/${m.h}`}}>
+          <img src={m.src} width={m.w} height={m.h} alt={m.alt} loading="lazy" decoding="async" className="size-full object-cover will-change-transform transition-[scale] duration-[1.2s] ease-out group-hover:scale-[1.04]" />
           {feature && (
             <>
               <span className="absolute inset-0 bg-gradient-to-t from-void/80 via-transparent to-transparent" />
